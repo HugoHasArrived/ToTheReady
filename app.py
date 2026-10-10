@@ -264,10 +264,13 @@ HTML_CODE = """
 </body>
 </html>
 """
+import os
 
-@app.route('/')
-def home():
-    return render_template_string(HTML_CODE)
+# ... Keep all your previous HTML_CODE and @app.route configurations exactly the same ...
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Render assigns a dynamic port environment variable (defaults to 10000)
+    port = int(os.environ.get("PORT", 5000))
+    
+    # Must bind to 0.0.0.0 so the public internet can route traffic to it
+    app.run(host="0.0.0.0", port=port, debug=True)
