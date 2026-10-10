@@ -10,105 +10,131 @@ HTML_CODE = """
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Flowers For You?</title>
+  <title>console.exe</title>
   <style>
-    /* ==================== MONOCHROME GLOBAL STYLES ==================== */
+    /* ==================== TERMINAL GLOBAL STYLES ==================== */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: 'Courier New', Courier, monospace;
     }
 
     body {
-      background-color: #fafafa;
+      background-color: #0c0c0c;
       height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
+      color: #00ff00;
+      padding: 20px;
     }
 
-    /* ==================== BLACK & WHITE TAB CARD ==================== */
-    .card-container {
+    /* ==================== COMMAND PROMPT WINDOW ==================== */
+    .terminal-window {
+      background-color: #000000;
+      border: 1px solid #333333;
+      border-radius: 6px;
       width: 100%;
-      height: 100%;
+      max-width: 500px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+      overflow: hidden;
+      transition: opacity 0.6s ease;
+    }
+
+    /* Terminal Title Bar */
+    .terminal-header {
+      background-color: #202020;
+      padding: 8px 14px;
       display: flex;
-      justify-content: center;
+      justify-content: space-between;
       align-items: center;
-      transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      border-bottom: 1px solid #333333;
+      user-select: none;
     }
 
-    .card {
-      background: #ffffff;
-      padding: 50px 60px;
-      border: 1px solid #e5e5e5;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-      text-align: center;
-      max-width: 440px;
-      width: 90%;
+    .terminal-title {
+      color: #cccccc;
+      font-size: 0.8rem;
     }
 
-    .heart-icon {
-      font-size: 32px;
-      margin-bottom: 24px;
-      color: #111111;
-      display: inline-block;
-      animation: heartbeat 2s infinite ease-in-out;
+    .terminal-controls {
+      display: flex;
+      gap: 8px;
+    }
+
+    .control-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: #444444;
+    }
+
+    /* Terminal Input/Output Space */
+    .terminal-body {
+      padding: 30px;
+      text-align: left;
+    }
+
+    .prompt-line {
+      margin-bottom: 15px;
+      color: #888888;
+      font-size: 0.9rem;
     }
 
     h1 {
-      color: #111111;
-      font-size: 1.75rem;
-      font-weight: 600;
-      letter-spacing: -0.025em;
-      margin-bottom: 32px;
+      color: #ffffff;
+      font-size: 1.4rem;
+      font-weight: normal;
+      margin-bottom: 30px;
+      line-height: 1.4;
     }
 
-    /* Tab-style clean aligned button group */
+    /* ==================== BUTTON ACTIONS GROUP ==================== */
     .btn-group {
       display: flex;
-      justify-content: center;
+      justify-content: flex-start;
       align-items: center;
-      gap: 12px;
-      min-height: 80px; /* Pre-allocates space so the interface doesn't jump */
+      gap: 15px;
+      min-height: 100px;
     }
 
     .btn {
-      font-size: 0.95rem;
-      font-weight: 500;
-      border: 1px solid #111111;
-      border-radius: 6px;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 1rem;
+      border: 1px solid #00ff00;
+      background-color: transparent;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       white-space: nowrap;
-      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      border-radius: 4px;
+      transition: transform 0.2s ease, font-size 0.2s ease, padding 0.2s ease, background-color 0.2s ease;
     }
 
-    /* Black Tab Style */
+    /* Terminal Accent Theme Button */
     .yes-btn {
-      background-color: #111111;
-      color: #ffffff;
-      padding: 12px 32px;
+      color: #000000;
+      background-color: #00ff00;
+      padding: 10px 28px;
+      font-weight: bold;
     }
 
     .yes-btn:hover {
-      background-color: #222222;
-      transform: translateY(-1px);
+      background-color: #00cc00;
+      border-color: #00cc00;
     }
 
-    /* White Tab Style */
+    /* Neutral Terminal Button */
     .no-btn {
-      background-color: #ffffff;
-      color: #111111;
-      padding: 12px 32px;
-      position: relative; /* Stays locked in place inside the group */
+      color: #ffffff;
+      border-color: #ffffff;
+      padding: 10px 28px;
     }
 
     .no-btn:hover {
-      background-color: #f5f5f5;
+      background-color: rgba(255, 255, 255, 0.1);
     }
 
     .fade-out {
@@ -116,99 +142,80 @@ HTML_CODE = """
       pointer-events: none;
     }
 
-    /* ==================== CONTAINER TRANSITIONS ==================== */
+    /* ==================== SCREEN SWITCHERS ==================== */
     .hidden {
       display: none;
       opacity: 0;
-      flex-direction: column;
-      align-items: center;
-      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+      width: 100%;
     }
 
     .show-screen {
-      display: flex !important;
+      display: block !important;
       opacity: 1;
     }
 
-    .garden-message, .sad-message {
-      text-align: center;
-      padding: 20px;
-    }
-
-    .garden-message h1 {
-      color: #111111;
-    }
-
-    .sad-message h1 {
-      color: #666666;
-    }
-
     .subtitle {
-      color: #666666;
-      font-size: 1.1rem;
-      margin-top: 12px;
-      font-weight: 400;
+      color: #a9a9a9;
+      font-size: 1rem;
+      line-height: 1.5;
+      margin-top: 15px;
     }
 
-    /* ==================== MONOCHROME FLOWER ANIMATION ==================== */
+    /* ==================== MATRIX / MONO FLOWER ==================== */
     .flower {
       position: relative;
-      width: 100px;
-      height: 220px;
-      margin-top: 40px;
+      width: 80px;
+      height: 180px;
+      margin: 40px auto 10px auto;
       animation: sway 4s ease-in-out infinite alternate;
     }
 
     .petal {
       position: absolute;
-      background: #111111;
+      background: #00ff00;
+      border: 1px solid #000000;
       border-radius: 50%;
-      width: 44px;
-      height: 44px;
+      width: 36px;
+      height: 36px;
     }
 
-    .petal-1 { top: 0; left: 28px; }
-    .petal-2 { top: 28px; left: 56px; }
-    .petal-3 { top: 56px; left: 28px; }
-    .petal-4 { top: 28px; left: 0; }
+    .petal-1 { top: 0; left: 22px; }
+    .petal-2 { top: 22px; left: 44px; }
+    .petal-3 { top: 44px; left: 22px; }
+    .petal-4 { top: 22px; left: 0; }
 
     .center {
       position: absolute;
-      top: 28px;
-      left: 28px;
-      background: #ffffff;
-      border: 1px solid #111111;
-      width: 44px;
-      height: 44px;
+      top: 22px;
+      left: 22px;
+      background: #000000;
+      border: 2px solid #00ff00;
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
     }
 
     .stem {
       position: absolute;
-      top: 100px;
-      left: 49px;
+      top: 80px;
+      left: 39px;
       width: 2px;
-      height: 120px;
-      background: #111111;
+      height: 100px;
+      background: #00ff00;
     }
 
     .leaf {
       position: absolute;
-      top: 140px;
-      left: 50px;
-      width: 30px;
-      height: 15px;
-      background: #ffffff;
-      border: 1px solid #111111;
-      border-radius: 0 15px 0 15px;
+      top: 110px;
+      left: 40px;
+      width: 24px;
+      height: 12px;
+      background: transparent;
+      border: 1px solid #00ff00;
+      border-radius: 0 12px 0 12px;
     }
 
-    /* ==================== ANIMATIONS ==================== */
-    @keyframes heartbeat {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.1); }
-    }
-
+    /* ==================== CORE ANIMATIONS ==================== */
     @keyframes sway {
       0% { transform: rotate(-3deg); transform-origin: bottom center; }
       100% { transform: rotate(3deg); transform-origin: bottom center; }
@@ -217,92 +224,108 @@ HTML_CODE = """
 </head>
 <body>
 
-  <!-- Screen 1: The Initial Request Interface -->
-  <div id="background" class="card-container">
-    <div class="card">
-      <div class="heart-icon">🖤</div>
-      <h1>Flowers For You?</h1>
-      <div class="btn-group">
-        <button id="yesBtn" class="btn yes-btn">Yes</button>
-        <button id="noBtn" class="btn no-btn">No</button>
+  <!-- Main Terminal Wrapper Window Container -->
+  <div id="terminalWindow" class="terminal-window">
+    
+    <!-- Window Head Bar Element -->
+    <div class="terminal-header">
+      <div class="terminal-title">C:\Users\admin\proposals\flowers.exe</div>
+      <div class="terminal-controls">
+        <div class="control-dot"></div>
+        <div class="control-dot"></div>
+        <div class="control-dot"></div>
       </div>
     </div>
+
+    <!-- Window Internal Body -->
+    <div class="terminal-body">
+      
+      <!-- SCREEN 1: Core Selection Logic Screen Interface -->
+      <div id="proposalContent">
+        <div class="prompt-line">Microsoft Windows [Version 10.0.22631]<br/>(c) Microsoft Corporation. All rights reserved.<br/><br/>\$ run heart_analysis.sh</div>
+        <h1>> Flowers For You? [Y/N]_</h1>
+        <div class="btn-group">
+          <button id="yesBtn" class="btn yes-btn">Yes</button>
+          <button id="noBtn" class="btn no-btn">No</button>
+        </div>
+      </div>
+
+      <!-- SCREEN 2: Garden Compilation Complete Frame (If Yes is clicked) -->
+      <div id="flowerContainer" class="hidden">
+        <div class="prompt-line">\$ compilation status: SUCCESSFUL</div>
+        <h1>> I coded you a whole garden! 💐</h1>
+        <p class="subtitle">Because you deserve all the flowers in the world.</p>
+        
+        <div class="flower">
+          <div class="petal petal-1"></div>
+          <div class="petal petal-2"></div>
+          <div class="petal petal-3"></div>
+          <div class="petal petal-4"></div>
+          <div class="center"></div>
+          <div class="stem"></div>
+          <div class="leaf"></div>
+        </div>
+      </div>
+
+      <!-- SCREEN 3: Rejection Failure Frame State (If No Shrinks to Limit) -->
+      <div id="sadContainer" class="hidden">
+        <div class="prompt-line" style="color: #ff3333;">\$ abort: process terminated by user decision.</div>
+        <h1 style="color: #ff3333;">> Im sorry... 💔</h1>
+        <p class="subtitle">ill leave you alone now but i will still listen...</p>
+      </div>
+
+    </div>
   </div>
 
-  <!-- Screen 2: Garden View (If Yes is chosen) -->
-  <div id="flowerContainer" class="hidden">
-    <div class="garden-message">
-      <h1>I coded you a whole garden! 💐</h1>
-      <p class="subtitle">Because you deserve all the flowers in the world.</p>
-    </div>
-    
-    <div class="flower">
-      <div class="petal petal-1"></div>
-      <div class="petal petal-2"></div>
-      <div class="petal petal-3"></div>
-      <div class="petal petal-4"></div>
-      <div class="center"></div>
-      <div class="stem"></div>
-      <div class="leaf"></div>
-    </div>
-  </div>
-
-  <!-- Screen 3: Sad View (If No shrinks all the way down) -->
-  <div id="sadContainer" class="hidden">
-    <div class="sad-message">
-      <h1>Im sorry... 💔</h1>
-      <p class="subtitle">ill leave you alone now but i will still listen...</p>
-    </div>
-  </div>
-
-  <!-- ==================== FRONTEND CONTROLLER LOGIC ==================== -->
+  <!-- ==================== FRONTEND TERMINAL ACTIONS LOGIC ==================== -->
   <script>
     const noBtn = document.getElementById("noBtn");
     const yesBtn = document.getElementById("yesBtn");
-    const background = document.getElementById("background");
+    const terminalWindow = document.getElementById("terminalWindow");
+    const proposalContent = document.getElementById("proposalContent");
     const flowerContainer = document.getElementById("flowerContainer");
     const sadContainer = document.getElementById("sadContainer");
 
     let clickCount = 0;
-    const clicksToReject = 6; // Total clicks on No before final rejection trigger
+    const clicksToReject = 7; // Gives them extra clicks to watch it shrink to a tiny dot
 
-    if (noBtn && yesBtn && background) {
+    if (noBtn && yesBtn && terminalWindow) {
       noBtn.addEventListener("click", (event) => {
         event.preventDefault();
         clickCount++;
 
         if (clickCount >= clicksToReject) {
-          // Final rejection screen transition
-          background.classList.add("fade-out");
+          // Fade window out briefly, clear text block state, switch to sadness framework
+          terminalWindow.classList.add("fade-out");
           setTimeout(() => {
-            background.style.display = "none";
+            proposalContent.style.display = "none";
             sadContainer.classList.add("show-screen");
+            terminalWindow.classList.remove("fade-out");
           }, 600);
         } else {
-          // Progressively calculate shrinking size values
-          const scaleFactor = 1 - (clickCount * 0.15); // Progressively shrinks step-by-step
-          const originalPaddingX = 32;
-          const originalPaddingY = 12;
-          const originalFontSize = 0.95;
+          // Shrinks the No button aggressively down to a microscopically small element
+          const scaleFactor = Math.max(1 - (clickCount * 0.14), 0.05); 
+          const originalPaddingX = 28;
+          const originalPaddingY = 10;
 
-          // Apply shrinking text size and box properties to the No button
           noBtn.style.transform = `scale(${scaleFactor})`;
-          noBtn.style.fontSize = `${originalFontSize * scaleFactor}rem`;
+          noBtn.style.fontSize = `${scaleFactor}rem`;
           noBtn.style.padding = `${originalPaddingY * scaleFactor}px ${originalPaddingX * scaleFactor}px`;
           
-          // Simultaneously scale up the Yes button options right alongside it
-          const yesScaleFactor = 1 + (clickCount * 0.25);
+          // Uniformly scales up the green Yes button to fill out the workspace space
+          const yesScaleFactor = 1 + (clickCount * 0.2);
           yesBtn.style.transform = `scale(${yesScaleFactor})`;
         }
       });
     }
 
-    if (yesBtn && background && flowerContainer) {
+    if (yesBtn && terminalWindow && flowerContainer) {
       yesBtn.addEventListener("click", () => {
-        background.classList.add("fade-out");
+        terminalWindow.classList.add("fade-out");
         setTimeout(() => {
-          background.style.display = "none";
-          flowerContainer.classList.add("show-garden", "show-screen");
+          proposalContent.style.display = "none";
+          flowerContainer.classList.add("show-screen");
+          terminalWindow.classList.remove("fade-out");
         }, 600); 
       });
     }
