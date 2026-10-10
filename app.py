@@ -1,7 +1,9 @@
+import os
 from flask import Flask, render_template_string
 
 app = Flask(__name__)
 
+# ==================== FRONTEND WEB CODE ====================
 HTML_CODE = """
 <!DOCTYPE html>
 <html lang="en">
@@ -10,12 +12,14 @@ HTML_CODE = """
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Flowers For You?</title>
   <style>
+    /* ==================== GLOBAL STYLES ==================== */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
+
     body {
       background-color: #ffeef2;
       overflow: hidden;
@@ -24,6 +28,8 @@ HTML_CODE = """
       justify-content: center;
       align-items: center;
     }
+
+    /* ==================== PROPOSAL CARD ==================== */
     .card-container {
       width: 100%;
       height: 100%;
@@ -32,6 +38,7 @@ HTML_CODE = """
       align-items: center;
       transition: opacity 0.8s ease;
     }
+
     .card {
       background: white;
       padding: 40px 50px;
@@ -39,22 +46,26 @@ HTML_CODE = """
       box-shadow: 0 10px 30px rgba(255, 105, 180, 0.2);
       text-align: center;
     }
+
     .heart-icon {
       font-size: 50px;
       margin-bottom: 20px;
       animation: pulse 1.5s infinite;
     }
+
     h1 {
       color: #d63384;
       margin-bottom: 30px;
       font-size: 2rem;
     }
+
     .btn-group {
       display: flex;
       justify-content: center;
       align-items: center;
       gap: 20px;
     }
+
     .btn {
       padding: 12px 35px;
       font-size: 1.1rem;
@@ -64,14 +75,17 @@ HTML_CODE = """
       cursor: pointer;
       transition: transform 0.2s ease, font-size 0.2s ease, padding 0.2s ease, background-color 0.3s ease;
     }
+
     .yes-btn {
       background-color: #ff477e;
       color: white;
       box-shadow: 0 5px 15px rgba(255, 71, 126, 0.4);
     }
+
     .yes-btn:hover {
       transform: scale(1.05);
     }
+
     .no-btn {
       background-color: #e2e8f0;
       color: #64748b;
@@ -80,6 +94,8 @@ HTML_CODE = """
       top: 60%;
       transition: left 0.1s ease-out, top 0.1s ease-out, transform 0.2s ease, padding 0.2s ease, font-size 0.2s ease;
     }
+
+    /* Tiny static layout state for the final decision */
     .no-btn.tiny-final {
       position: static !important; 
       background-color: #f1f5f9;
@@ -89,10 +105,13 @@ HTML_CODE = """
       font-weight: 400;
       box-shadow: none;
     }
+
     .fade-out {
       opacity: 0;
       pointer-events: none;
     }
+
+    /* ==================== SCREENS CHANGERS ==================== */
     .hidden {
       display: none;
       opacity: 0;
@@ -100,17 +119,22 @@ HTML_CODE = """
       align-items: center;
       transition: opacity 1s ease-in;
     }
+
     .show-screen {
       display: flex !important;
       opacity: 1;
     }
+
     .garden-message, .sad-message {
       text-align: center;
       animation: fadeInUp 1s ease;
     }
+
     .sad-message h1 {
       color: #64748b;
     }
+
+    /* ==================== CSS FLOWER ==================== */
     .flower {
       position: relative;
       width: 100px;
@@ -118,6 +142,7 @@ HTML_CODE = """
       margin-top: 50px;
       animation: sway 3s ease-in-out infinite alternate;
     }
+
     .petal {
       position: absolute;
       background: #ff70a6;
@@ -125,10 +150,12 @@ HTML_CODE = """
       width: 50px;
       height: 50px;
     }
+
     .petal-1 { top: 0; left: 25px; }
     .petal-2 { top: 25px; left: 50px; }
     .petal-3 { top: 50px; left: 25px; }
     .petal-4 { top: 25px; left: 0; }
+
     .center {
       position: absolute;
       top: 25px;
@@ -138,6 +165,7 @@ HTML_CODE = """
       height: 50px;
       border-radius: 50%;
     }
+
     .stem {
       position: absolute;
       top: 95px;
@@ -147,6 +175,7 @@ HTML_CODE = """
       background: #06d6a0;
       border-radius: 3px;
     }
+
     .leaf {
       position: absolute;
       top: 140px;
@@ -156,15 +185,19 @@ HTML_CODE = """
       background: #06d6a0;
       border-radius: 0 20px 0 20px;
     }
+
+    /* ==================== ANIMATIONS ==================== */
     @keyframes pulse {
       0% { transform: scale(1); }
       50% { transform: scale(1.15); }
       100% { transform: scale(1); }
     }
+
     @keyframes fadeInUp {
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
     }
+
     @keyframes sway {
       0% { transform: rotate(-2deg); transform-origin: bottom center; }
       100% { transform: rotate(2deg); transform-origin: bottom center; }
@@ -173,6 +206,7 @@ HTML_CODE = """
 </head>
 <body>
 
+  <!-- Screen 1: The proposal query wrapper -->
   <div id="background" class="card-container">
     <div class="card">
       <div class="heart-icon">❤️</div>
@@ -184,11 +218,13 @@ HTML_CODE = """
     </div>
   </div>
 
+  <!-- Screen 2: Garden View (Yes Clicked) -->
   <div id="flowerContainer" class="hidden">
     <div class="garden-message">
       <h1>I coded you a whole garden! 💐</h1>
       <p>Because you deserve all the flowers in the world.</p>
     </div>
+    
     <div class="flower">
       <div class="petal petal-1"></div>
       <div class="petal petal-2"></div>
@@ -200,6 +236,7 @@ HTML_CODE = """
     </div>
   </div>
 
+  <!-- Screen 3: Sad View (Tiny No Clicked) -->
   <div id="sadContainer" class="hidden">
     <div class="sad-message">
       <h1>Im sorry... 💔</h1>
@@ -207,6 +244,7 @@ HTML_CODE = """
     </div>
   </div>
 
+  <!-- ==================== LOGIC ACTIONS ==================== -->
   <script>
     const noBtn = document.getElementById("noBtn");
     const yesBtn = document.getElementById("yesBtn");
@@ -224,8 +262,10 @@ HTML_CODE = """
         escapeCount++;
 
         if (escapeCount >= maxEscapes) {
+          // Permanently scale and anchor into the small static container placement
           noBtn.classList.add("tiny-final");
         } else {
+          // Continue randomized screen jumping bounds configuration
           const left = 12 + Math.random() * 70; 
           const top = 15 + Math.random() * 70;
           noBtn.style.left = left + '%';
@@ -264,13 +304,12 @@ HTML_CODE = """
 </body>
 </html>
 """
-import os
 
-# ... Keep all your previous HTML_CODE and @app.route configurations exactly the same ...
+@app.route('/')
+def home():
+    return render_template_string(HTML_CODE)
 
 if __name__ == '__main__':
-    # Render assigns a dynamic port environment variable (defaults to 10000)
+    # Configured explicitly for local execution + external production routing
     port = int(os.environ.get("PORT", 5000))
-    
-    # Must bind to 0.0.0.0 so the public internet can route traffic to it
     app.run(host="0.0.0.0", port=port, debug=True)
