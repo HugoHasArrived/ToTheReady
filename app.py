@@ -3,7 +3,7 @@ from flask import Flask, render_template_string
 
 app = Flask(__name__)
 
-# Added 'r' right before the string to safely ignore path character escapes like \U
+# The raw string format (r""") protects path escapes like \U from causing Python deployment crashes
 HTML_CODE = r"""
 <!DOCTYPE html>
 <html lang="en">
@@ -204,7 +204,7 @@ HTML_CODE = r"""
       background: #00ff00;
     }
 
-    .leaf {
+    .flower-leaf {
       position: absolute;
       top: 110px;
       left: 40px;
@@ -243,7 +243,7 @@ HTML_CODE = r"""
       <!-- SCREEN 1: Core Selection Logic Screen Interface -->
       <div id="proposalContent">
         <div class="prompt-line">Microsoft Windows [Version 10.0.22631]<br/>(c) Microsoft Corporation. All rights reserved.<br/><br/>\$ run heart_analysis.sh</div>
-        <h1>> Flowers For You? [Y/N]_</h1>
+        <h1>> will you be mine... [Y/N]_</h1>
         <div class="btn-group">
           <button id="yesBtn" class="btn yes-btn">Yes</button>
           <button id="noBtn" class="btn no-btn">No</button>
@@ -263,7 +263,7 @@ HTML_CODE = r"""
           <div class="petal petal-4"></div>
           <div class="center"></div>
           <div class="stem"></div>
-          <div class="leaf"></div>
+          <div class="flower-leaf"></div>
         </div>
       </div>
 
@@ -287,7 +287,7 @@ HTML_CODE = r"""
     const sadContainer = document.getElementById("sadContainer");
 
     let clickCount = 0;
-    const clicksToReject = 7; 
+    const clicksToReject = 5; // Triggers the rejection screen on the 5th click
 
     if (noBtn && yesBtn && terminalWindow) {
       noBtn.addEventListener("click", (event) => {
@@ -295,6 +295,7 @@ HTML_CODE = r"""
         clickCount++;
 
         if (clickCount >= clicksToReject) {
+          // Fade window out briefly, clear text block state, switch to sadness framework
           terminalWindow.classList.add("fade-out");
           setTimeout(() => {
             proposalContent.style.display = "none";
@@ -302,7 +303,8 @@ HTML_CODE = r"""
             terminalWindow.classList.remove("fade-out");
           }, 600);
         } else {
-          const scaleFactor = Math.max(1 - (clickCount * 0.14), 0.05); 
+          // Slowly shrinks the button but keeps it perfectly readable (minimum scale limit 0.6)
+          const scaleFactor = Math.max(1 - (clickCount * 0.1), 0.6); 
           const originalPaddingX = 28;
           const originalPaddingY = 10;
 
@@ -310,6 +312,7 @@ HTML_CODE = r"""
           noBtn.style.fontSize = `${scaleFactor}rem`;
           noBtn.style.padding = `${originalPaddingY * scaleFactor}px ${originalPaddingX * scaleFactor}px`;
           
+          // Uniformly scales up the green Yes button to fill out the workspace space
           const yesScaleFactor = 1 + (clickCount * 0.2);
           yesBtn.style.transform = `scale(${yesScaleFactor})`;
         }
@@ -329,12 +332,3 @@ HTML_CODE = r"""
   </script>
 </body>
 </html>
-"""
-
-@app.route('/')
-def home():
-    return render_template_string(HTML_CODE)
-
-if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port, debug=True)
