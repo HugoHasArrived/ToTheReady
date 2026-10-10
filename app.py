@@ -3,7 +3,7 @@ from flask import Flask, render_template_string
 
 app = Flask(__name__)
 
-# The raw string format (r""") protects path escapes like \U from causing Python deployment crashes
+# The raw string format handles backend data routing securely without string termination breaks
 HTML_CODE = r"""
 <!DOCTYPE html>
 <html lang="en">
@@ -287,7 +287,7 @@ HTML_CODE = r"""
     const sadContainer = document.getElementById("sadContainer");
 
     let clickCount = 0;
-    const clicksToReject = 5; // Triggers the rejection screen on the 5th click
+    const clicksToReject = 5; 
 
     if (noBtn && yesBtn && terminalWindow) {
       noBtn.addEventListener("click", (event) => {
@@ -295,7 +295,6 @@ HTML_CODE = r"""
         clickCount++;
 
         if (clickCount >= clicksToReject) {
-          // Fade window out briefly, clear text block state, switch to sadness framework
           terminalWindow.classList.add("fade-out");
           setTimeout(() => {
             proposalContent.style.display = "none";
@@ -303,8 +302,8 @@ HTML_CODE = r"""
             terminalWindow.classList.remove("fade-out");
           }, 600);
         } else {
-          // Slowly shrinks the button but keeps it perfectly readable (minimum scale limit 0.6)
-          const scaleFactor = Math.max(1 - (clickCount * 0.1), 0.6); 
+          // Shrinks the No button slightly but keeps it readable (stops at 65% scale size)
+          const scaleFactor = Math.max(1 - (clickCount * 0.09), 0.65); 
           const originalPaddingX = 28;
           const originalPaddingY = 10;
 
@@ -312,8 +311,7 @@ HTML_CODE = r"""
           noBtn.style.fontSize = `${scaleFactor}rem`;
           noBtn.style.padding = `${originalPaddingY * scaleFactor}px ${originalPaddingX * scaleFactor}px`;
           
-          // Uniformly scales up the green Yes button to fill out the workspace space
-          const yesScaleFactor = 1 + (clickCount * 0.2);
+          const yesScaleFactor = 1 + (clickCount * 0.25);
           yesBtn.style.transform = `scale(${yesScaleFactor})`;
         }
       });
@@ -332,3 +330,12 @@ HTML_CODE = r"""
   </script>
 </body>
 </html>
+"""
+
+@app.route('/')
+def home():
+    return render_template_string(HTML_CODE)
+
+if __name__ == '__main__':
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=True)
