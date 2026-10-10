@@ -3,8 +3,8 @@ from flask import Flask, render_template_string
 
 app = Flask(__name__)
 
-# ==================== FRONTEND WEB CODE ====================
-HTML_CODE = """
+# Added 'r' right before the string to safely ignore path character escapes like \U
+HTML_CODE = r"""
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -287,7 +287,7 @@ HTML_CODE = """
     const sadContainer = document.getElementById("sadContainer");
 
     let clickCount = 0;
-    const clicksToReject = 7; // Gives them extra clicks to watch it shrink to a tiny dot
+    const clicksToReject = 7; 
 
     if (noBtn && yesBtn && terminalWindow) {
       noBtn.addEventListener("click", (event) => {
@@ -295,7 +295,6 @@ HTML_CODE = """
         clickCount++;
 
         if (clickCount >= clicksToReject) {
-          // Fade window out briefly, clear text block state, switch to sadness framework
           terminalWindow.classList.add("fade-out");
           setTimeout(() => {
             proposalContent.style.display = "none";
@@ -303,7 +302,6 @@ HTML_CODE = """
             terminalWindow.classList.remove("fade-out");
           }, 600);
         } else {
-          // Shrinks the No button aggressively down to a microscopically small element
           const scaleFactor = Math.max(1 - (clickCount * 0.14), 0.05); 
           const originalPaddingX = 28;
           const originalPaddingY = 10;
@@ -312,7 +310,6 @@ HTML_CODE = """
           noBtn.style.fontSize = `${scaleFactor}rem`;
           noBtn.style.padding = `${originalPaddingY * scaleFactor}px ${originalPaddingX * scaleFactor}px`;
           
-          // Uniformly scales up the green Yes button to fill out the workspace space
           const yesScaleFactor = 1 + (clickCount * 0.2);
           yesBtn.style.transform = `scale(${yesScaleFactor})`;
         }
